@@ -25,7 +25,20 @@ app.use(
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, './views'));
-app.use(express.static(path.join(__dirname, './provided/static')));
+
+app.locals.siteName = 'MEETUPS';
+app.use(express.static(path.join(__dirname, './static')));
+
+app.use(async (req, res, next) => {
+  try {
+    const names = await speakerService.getNames();
+    res.locals.speakerNames = names;
+
+    return next();
+  } catch (error) {
+    return next(error);
+  }
+});
 
 app.use(
   '/',
