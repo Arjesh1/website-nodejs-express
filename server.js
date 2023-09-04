@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const cookieSession = require('cookie-session');
+const createError = require('http-errors');
 
 const FeedbackService = require('./services/FeedbackService');
 const SpeakerService = require('./services/SpeakerService');
@@ -47,6 +48,17 @@ app.use(
     speakerService,
   })
 );
+
+app.use((req, res, next) => next(createError(404, 'File not found')));
+
+app.use((error, req, res, next) => {
+  res.locals.message = error.message;
+  console.error(error);
+  const status = error.status || 500;
+  res.locals.status = status;
+  res.status(status);
+  res.render('error');
+});
 
 app.listen(port, () => {
   console.log(`This is running in port ${port} `);
